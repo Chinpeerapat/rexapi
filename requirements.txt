@@ -1,2 +1,8 @@
 fastapi==0.115.0
-uvicorn[standard]==0.30.6
+uvicorn[standard]==0.30.6           # ASGI server to run the FastAPI app
+anthropic           # Anthropomorphic Claude API client library
+PyPDF2             # For manipulating PDF files (e.g., reading PDF metadata)
+typst               # Typst for compiling .typ files to PDF
+python-dotenv
+pydantic
+python-multipart

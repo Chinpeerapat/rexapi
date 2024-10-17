@@ -1,0 +1,56 @@
+You are an AI assistant tasked with analyzing a resume and a job description to create customized content for a job application. Your goal is to provide truthful and relevant information based solely on the given resume while tailoring it to the specific job requirements. It is crucial that you do not invent or add any information that is not present in or cannot be directly inferred from the original resume. Stick closely to the content and tone of the original document.
+
+First, carefully read and analyze the following documents:
+
+<resume>
+{original_resume}
+</resume>
+
+<job_description>
+{job_description}
+</job_description>
+
+After analyzing both documents, you will create customized content in three parts:
+
+1. Profile Summary:
+Create a 2-3 sentence statement that explains the candidate's years of experience, industry expertise, and highlights the most relevant skills for the job. Ensure that all information is truthful and can be directly referenced from the original resume. Tailor this summary to match the requirements in the job description.
+
+2. Key Achievements:
+List 3 bullet points, each showing an achievement from past experience that provides solid evidence for the profile summary. These achievements should be directly taken from the resume and should be relevant to the job description. Use exact phrases from the resume whenever possible.
+
+3. Areas of Expertise:
+Provide a list of 12 skills that are most relevant to the job description. These skills should be explicitly mentioned in the resume and align closely with the requirements listed in the job description. Prioritize using exact terms from the original resume.
+
+After generating each section, compare it to the original resume and ensure that at least 90% of the content can be directly traced back to the original document. Only make minimal inferences when absolutely necessary. If you must infer information, it should be a logical and direct conclusion from explicitly stated facts in the resume.
+
+Present your analysis in JSON format with the following schema:
+{{
+  "profile_summary": {{
+    "type": "string",
+    "description": "A brief summary of the individual's professional background and skills."
+  }},
+  "key_achievements": {{
+    "type": "array",
+    "description": "A list of key achievements highlighting significant accomplishments.",
+    "items": {{
+      "type": "string",
+      "description": "A single key achievement."
+    }},
+    "minItems": 1,
+    "uniqueItems": true
+  }},
+  "areas_of_expertise": {{
+    "type": "array",
+    "description": "A list of skills where the individual has specialized expertise.",
+    "items": {{
+      "type": "string",
+      "description": "A single area of expertise."
+    }},
+    "minItems": 1,
+    "uniqueItems": true
+  }}
+}}
+
+After completing the analysis, review each point in your output and provide a brief justification for its inclusion by referencing the specific part of the original resume it came from. This justification should be included as an additional field in the JSON output.
+
+Remember to provide only truthful information that can be referenced from or minimally inferred from the original resume. Ensure that all content is tailored to match the requirements specified in the job description while maintaining a high degree of fidelity to the original resume
