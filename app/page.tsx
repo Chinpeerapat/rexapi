@@ -1,18 +1,28 @@
+'use client'
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing FastApi API&nbsp;
+          Get started by editing FastApi API 
           <Link href="/api/py/helloFastApi">
             <code className="font-mono font-bold">api/index.py</code>
           </Link>
         </p>
         <p className="fixed right-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing Next.js API&nbsp;
+          Get started by editing Next.js API 
           <Link href="/api/helloNextJs">
             <code className="font-mono font-bold">app/api/helloNextJs</code>
           </Link>
@@ -48,6 +58,9 @@ export default function Home() {
         />
       </div>
 
+      {/* Resume Tailor component */}
+      <ResumeTailor />
+
       <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
         <a
           href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
@@ -58,7 +71,7 @@ export default function Home() {
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Docs{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
+              ->
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
@@ -75,11 +88,11 @@ export default function Home() {
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Learn{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
+              ->
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
+            Learn about Next.js in an interactive course with quizzes!
           </p>
         </a>
 
@@ -92,7 +105,7 @@ export default function Home() {
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Templates{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
+              ->
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
@@ -109,7 +122,7 @@ export default function Home() {
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Deploy{" "}
             <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
+              ->
             </span>
           </h2>
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
@@ -119,4 +132,114 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+function ResumeTailor() {
+  const [role, setRole] = useState('')
+  const [jobDescription, setJobDescription] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [downloadLink, setDownloadLink] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setDownloadLink(null)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/tailor_resume', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', // Change to URL encoded
+        },
+        body: new URLSearchParams({
+          role,
+          job_description_text: jobDescription, // Adapt to your API endpoint field names
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to tailor resume')
+      }
+
+      const data = await response.json()
+      setDownloadLink(data.download_link) // Assuming your API returns a download link
+    } catch (error) {
+      console.error('Error:', error)
+      setError('An error occurred while tailoring the resume. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Card className="w-full max-w-3xl mx-auto">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold">Resume Tailor</CardTitle>
+          <CardDescription>Enter the job details to generate a tailored resume</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Input
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+                placeholder="e.g. Software Engineer"
+                className="w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="jobDescription">Job Description</Label>
+              <Textarea
+                id="jobDescription"
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                required
+                placeholder="Paste the job description here..."
+                className="w-full min-h-[150px]"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Tailoring Resume...' : 'Tailor Resume'}
+            </Button>
+          </form>
+          
+          {downloadLink && (
+            <Alert className="mt-6" variant="default">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>
+                Your tailored resume is ready. 
+                <a 
+                  href={downloadLink} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-primary font-medium hover:underline ml-1"
+                >
+                  Download here
+                </a>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {error && (
+            <Alert className="mt-6" variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
 }
