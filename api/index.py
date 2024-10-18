@@ -1,18 +1,29 @@
 import logging
 from fastapi import FastAPI, HTTPException, Form
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware  # Import CORS middleware
 from typing import Optional
 import anthropic
 import json
 from datetime import datetime
 import os
 import typst
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
-# --- Logging setup ---
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+app = FastAPI(docs_url="/api/docs", openapi_url="/api/openapi.json")
+# --- Logging setup ---
+# --- CORS Configuration ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Set your Anthropic API key
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
@@ -44,8 +55,6 @@ async def tailor_resume(
     logger.info(f"API called: /tailor_resume with role={role}")
     logger.info(f"Request body: role={role}, job_description_text={job_description_text}")
 
-    global generated_resume_filename
-
     # --- Get the pre-uploaded resume content ---
     try:
         resume_text = get_file_content("app/original_resume.txt")
@@ -62,12 +71,8 @@ async def tailor_resume(
         original_resume=resume_text,
         job_description=job_description_text
     )
-        # Call the resume tailoring function
+    # Call the resume tailoring function
     tailored_content = generate_tailored_content(prompt)
-
-    if "error" in tailored_content:
-        logger.error(f"Error in tailored content generation: {tailored_content['error']}")
-        return tailored_content
 
     if "error" in tailored_content:
         logger.error(f"Error in tailored content generation: {tailored_content['error']}")

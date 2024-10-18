@@ -16,7 +16,6 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Page() {
-  // Renamed from ResumeTailor to Page
   const [role, setRole] = useState("");
   const [jobDescription, setJobDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -35,10 +34,15 @@ export default function Page() {
       formData.append("role", role);
       formData.append("job_description_text", jobDescription);
 
-      // Adjust the URL based on your backend's deployment
-      // Using the rewritten API path
-      const response = await fetch("/api/py/tailor_resume/", {
-        // Updated endpoint
+      // Use the API base URL from environment variables
+      const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+      if (!apiBaseUrl) {
+        throw new Error("API base URL is not defined.");
+      }
+
+      // Fetch the tailor_resume endpoint
+      const response = await fetch(`${apiBaseUrl}/tailor_resume/`, {
         method: "POST",
         body: formData,
       });
@@ -51,9 +55,9 @@ export default function Page() {
       const data = await response.json();
 
       if (data.download_link) {
-        // Prepend '/api/py' to the download link to align with rewrites
+        // Construct the full download link using the API base URL
         const downloadLink = data.download_link.startsWith("/")
-          ? `/api/py${data.download_link}`
+          ? `${apiBaseUrl}${data.download_link}`
           : data.download_link;
         setResult(downloadLink);
       } else if (data.error) {
